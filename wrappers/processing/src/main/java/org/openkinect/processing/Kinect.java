@@ -15,6 +15,7 @@ import processing.core.PImage;
 public class Kinect extends Thread {
     public static PApplet parent;
 
+    boolean depth_registered = false;
     boolean running = false;
 
     Context context;
@@ -39,6 +40,7 @@ public class Kinect extends Thread {
 
         device = context.openDevice(0);
         device.setDepthFormat(DepthFormat.D11BIT);
+        depth_registered = false;
         kimg = new RGBImage(parent);
         dimg = new DepthImage(parent);
         running = true;
@@ -71,6 +73,21 @@ public class Kinect extends Thread {
     public void enableDepth(boolean b) {
         if (b) device.startDepth(dimg);
         else device.stopDepth();
+    }
+
+    public void enableDepth(boolean b, boolean registered) {
+        device.stopDepth();
+        if (registered) {
+            device.setDepthFormat(DepthFormat.REGISTERED);
+        } else {
+            device.setDepthFormat(DepthFormat.D11BIT);
+        }
+        depth_registered = registered;
+        enableDepth(b);
+    }
+
+    public boolean getDepthRegistered() {
+        return depth_registered;
     }
 
     public void enableRGB(boolean b) {
